@@ -2,14 +2,9 @@
 
 ## Context
 
-You're joining the InvestWhat engineering team. This is a simplified version of our portfolio management feature — users can view their stock holdings and add buy/sell transactions.
+You're joining the InvestWhat engineering team. This is a simplified version of our portfolio management feature — users can view their stock holdings and add transactions (buy, sell, dividend).
 
-**The feature is currently broken.** Users are reporting:
-- Errors when trying to add transactions
-- Wrong numbers showing in the portfolio after transactions
-- The portfolio not updating after a successful transaction
-
-Your job is to find and fix all the issues.
+**The feature is broken across multiple layers.** Users are reporting a range of issues — from hard errors to silent wrong numbers to stale UI. Your job is to find and fix all of them.
 
 ---
 
@@ -26,23 +21,26 @@ Open your browser at **http://localhost:5173**
 
 ## Your Task
 
-1. Run the app and reproduce the reported problems
-2. Use the **AI CLI** to investigate and fix the issues
-3. Validate that everything works end-to-end after your fixes
+Use the **AI CLI** to investigate and fix all issues end-to-end.
 
-You should be able to:
-- Add a transaction for a stock you already hold (e.g. AAPL)
-- See the holdings table update with the correct average cost
-- Add multiple transactions and confirm the numbers are right
+Work through the following scenarios and make sure each one behaves correctly:
+
+1. **Add a BUY for a stock you already hold** (e.g. AAPL) — does it work without errors?
+2. **Add a BUY with a non-zero fee** — does the average cost update correctly?
+3. **Add a SELL transaction** — does the portfolio reflect the correct position after?
+4. **After adding any transaction** — does the holdings table update without a full page refresh?
+5. **When errors occur** — is what's shown to the user appropriate?
+
+You should be able to add multiple transactions across all types and always see accurate holdings with correct cost calculations.
 
 ---
 
 ## Rules
 
 - You **must** use the AI CLI to assist your work
-- Do not just ask "fix everything" — understand what each bug is before accepting a fix
-- Be ready to explain each fix to the interviewer
-- The fix for each bug is **small** — you won't need to rewrite anything
+- Do not just ask the AI to "find all bugs" — trace each issue from the symptom to the root cause before accepting a fix
+- The fix for each issue is **small** — you won't need to rewrite anything
+- Be ready to explain every change you make to the interviewer
 
 ---
 
@@ -50,9 +48,10 @@ You should be able to:
 
 ```
 backend/src/
-  db/database.ts          ← database layer
-  services/transactionService.ts   ← business logic
+  db/database.ts               ← database layer
+  services/transactionService.ts    ← business logic & calculations
 frontend/src/
+  App.tsx                      ← main layout and data fetching
   components/AddTransactionForm.tsx  ← transaction form
 ```
 

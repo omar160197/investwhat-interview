@@ -2,11 +2,11 @@ import { db, holdingsCount } from "./database";
 import { v4 as uuidv4 } from "uuid";
 
 export function seedIfEmpty(): void {
-  if (holdingsCount() > 0) return; // already seeded
+  if (holdingsCount() > 0) return;
 
   console.log("[seed] Seeding initial portfolio data...");
 
-  // Seed transactions first (the source of truth)
+  // Transactions include brokerage fees — these should affect cost basis
   const transactions = [
     {
       id: uuidv4(),
@@ -16,8 +16,8 @@ export function seedIfEmpty(): void {
       date: "2024-01-15",
       quantity: 10,
       unit_price: 150.0,
-      fee: 0,
-      total_amount: 1500.0,
+      fee: 10.0,
+      total_amount: 1510.0,
       created_at: new Date().toISOString(),
     },
     {
@@ -28,8 +28,8 @@ export function seedIfEmpty(): void {
       date: "2024-01-20",
       quantity: 5,
       unit_price: 200.0,
-      fee: 0,
-      total_amount: 1000.0,
+      fee: 10.0,
+      total_amount: 1010.0,
       created_at: new Date().toISOString(),
     },
     {
@@ -51,7 +51,11 @@ export function seedIfEmpty(): void {
     VALUES (@id, @symbol, @name, @type, @date, @quantity, @unit_price, @fee, @total_amount, @created_at)
   `);
 
-  // Seed holdings with correct values directly (bypassing FIFO service)
+  // Holdings reflect what the current (buggy) FIFO computation produces.
+  // Fee is NOT factored into cost basis — average costs are understated.
+  //   AAPL: paid $1510 for 10 shares → correct avg = $151.00, stored as $150.00
+  //   TSLA: paid $1010 for 5 shares  → correct avg = $202.00, stored as $200.00
+  //   MSFT: paid $3040, no fee       → correct avg = $380.00, stored as $380.00 (correct)
   const insertHolding = db.prepare(`
     INSERT INTO holdings (id, symbol, name, quantity, average_cost, total_cost)
     VALUES (@id, @symbol, @name, @quantity, @average_cost, @total_cost)
