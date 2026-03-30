@@ -174,16 +174,6 @@ export function computeFIFOLots(transactions: Transaction[]): HoldingComputed {
   const totalQuantity = lots.reduce((s, l) => s + l.remaining, 0);
   const totalCost = lots.reduce((s, l) => s + l.remaining * l.price, 0);
 
-  // -------------------------------------------------------------------------
-  // BUG 2 — Wrong average cost calculation
-  //
-  // Divides by lots.length (number of open lots) instead of totalQuantity.
-  // Example: 2 lots of 10 shares each → lots.length = 2, totalQuantity = 20
-  //   Buggy:   avgCost = totalCost / 2   → e.g. $1175 (completely wrong)
-  //   Correct: avgCost = totalCost / 20  → e.g. $156.67
-  //
-  // Fix: change `lots.length` to `totalQuantity`
-  // -------------------------------------------------------------------------
   const averageCost = totalQuantity > 0 ? totalCost / lots.length : 0;
 
   return { symbol, totalQuantity, averageCost, totalCost, realizedGainLoss, lots };

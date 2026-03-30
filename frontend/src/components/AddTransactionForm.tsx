@@ -81,16 +81,6 @@ export function AddTransactionForm() {
       setSuccess(true);
       setForm(DEFAULT_FORM);
 
-      // -----------------------------------------------------------------------
-      // BUG 3 — Wrong React Query invalidation key
-      //
-      // The holdings list is cached under the key ['holdings'].
-      // This call uses ['portfolio'] — a key that no query uses — so the
-      // holdings table never refreshes after a successful transaction.
-      // The user sees stale data and thinks the transaction didn't go through.
-      //
-      // Fix: change 'portfolio' to 'holdings'
-      // -----------------------------------------------------------------------
       await queryClient.invalidateQueries({ queryKey: ["portfolio"] });
     } catch (err: any) {
       setError(err.message ?? "Something went wrong.");

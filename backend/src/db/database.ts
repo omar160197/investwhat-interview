@@ -68,20 +68,6 @@ export function insertTransaction(txn: {
   ).run(txn);
 }
 
-// -------------------------------------------------------------------------
-// BUG 1 — Missing ON CONFLICT clause
-//
-// The holdings table has UNIQUE(symbol). When a user already holds a stock
-// and adds another BUY, this INSERT throws:
-//   "UNIQUE constraint failed: holdings.symbol"
-//
-// Fix: replace the INSERT with an upsert:
-//   INSERT INTO holdings (...) VALUES (...)
-//   ON CONFLICT(symbol) DO UPDATE SET
-//     quantity     = excluded.quantity,
-//     average_cost = excluded.average_cost,
-//     total_cost   = excluded.total_cost
-// -------------------------------------------------------------------------
 export function upsertHolding(holding: {
   id: string;
   symbol: string;
@@ -94,10 +80,6 @@ export function upsertHolding(holding: {
     `
     INSERT INTO holdings (id, symbol, name, quantity, average_cost, total_cost)
     VALUES (@id, @symbol, @name, @quantity, @averageCost, @totalCost)
-    ON CONFLICT(symbol) DO UPDATE SET
-      quantity     = excluded.quantity,
-      average_cost = excluded.average_cost,
-      total_cost   = excluded.total_cost
   `,
   ).run(holding);
 }
