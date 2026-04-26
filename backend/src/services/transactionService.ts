@@ -136,7 +136,13 @@ export function computeFIFOLots(transactions: Transaction[]): HoldingComputed {
     const price = Number(txn.unitPrice);
 
     switch (txn.type) {
-      case "BUY":
+      case "BUY": {
+        // Include fee in the per-share cost for BUY transactions
+        const feePerShare = txn.fee / qty;
+        const priceWithFee = price + feePerShare;
+        lots.push({ txnId: txn.id, date: txn.date, quantity: qty, price: priceWithFee, remaining: qty });
+        break;
+      }
       case "OPENING_BALANCE":
         lots.push({ txnId: txn.id, date: txn.date, quantity: qty, price, remaining: qty });
         break;
@@ -174,7 +180,7 @@ export function computeFIFOLots(transactions: Transaction[]): HoldingComputed {
   const totalQuantity = lots.reduce((s, l) => s + l.remaining, 0);
   const totalCost = lots.reduce((s, l) => s + l.remaining * l.price, 0);
 
-  const averageCost = totalQuantity > 0 ? totalCost / lots.length : 0;
+  const averageCost = totalQuantity > 0 ? totalCost / totalQuantity : 0;
 
   return { symbol, totalQuantity, averageCost, totalCost, realizedGainLoss, lots };
 }
