@@ -32,7 +32,7 @@ router.get("/", (_req: Request, res: Response) => {
     return res.json(holdings);
   } catch (err: any) {
     console.error("[GET /api/holdings] Error:", err.message);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: "Failed to load holdings. Please refresh the page." });
   }
 });
 

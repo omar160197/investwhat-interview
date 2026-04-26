@@ -81,9 +81,10 @@ export function AddTransactionForm() {
       setSuccess(true);
       setForm(DEFAULT_FORM);
 
-      await queryClient.invalidateQueries({ queryKey: ["portfolio"] });
+      await queryClient.invalidateQueries({ queryKey: ["holdings"] });
     } catch (err: any) {
-      setError(err.message ?? "Something went wrong.");
+      const message = err?.message || "An unexpected error occurred. Please try again.";
+      setError(message);
     } finally {
       setLoading(false);
     }
