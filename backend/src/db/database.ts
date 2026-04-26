@@ -80,6 +80,12 @@ export function upsertHolding(holding: {
     `
     INSERT INTO holdings (id, symbol, name, quantity, average_cost, total_cost)
     VALUES (@id, @symbol, @name, @quantity, @averageCost, @totalCost)
+    ON CONFLICT(symbol) DO UPDATE SET
+      id = @id,
+      name = @name,
+      quantity = @quantity,
+      average_cost = @averageCost,
+      total_cost = @totalCost
   `,
   ).run(holding);
 }
