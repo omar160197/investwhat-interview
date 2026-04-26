@@ -8,21 +8,30 @@ router.post("/", (req: Request, res: Response) => {
   try {
     const input = req.body as CreateTransactionInput;
 
-    if (!input.symbol || !input.name || !input.type || !input.date) {
-      return res.status(400).json({ error: "Missing required fields: symbol, name, type, date" });
+    if (!input.symbol) {
+      return res.status(400).json({ error: "Stock symbol is required." });
     }
-    if (!input.quantity || input.quantity <= 0) {
-      return res.status(400).json({ error: "quantity must be a positive number" });
+    if (!input.name) {
+      return res.status(400).json({ error: "Stock name is required." });
+    }
+    if (!input.type) {
+      return res.status(400).json({ error: "Transaction type is required." });
+    }
+    if (!input.date) {
+      return res.status(400).json({ error: "Transaction date is required." });
+    }
+    if (input.quantity == null || input.quantity <= 0) {
+      return res.status(400).json({ error: "Quantity must be a positive number." });
     }
     if (input.unitPrice == null || input.unitPrice < 0) {
-      return res.status(400).json({ error: "unitPrice must be a non-negative number" });
+      return res.status(400).json({ error: "Unit price must be a non-negative number." });
     }
 
     const txn = createTransaction(input);
     return res.status(201).json(txn);
   } catch (err: any) {
     console.error("[POST /api/transactions] Error:", err.message);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: "Failed to add transaction. Please try again." });
   }
 });
 
